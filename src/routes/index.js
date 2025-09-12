@@ -1,10 +1,11 @@
 import { Router } from "express";
 import patientRoutes from "./patientRoutes.js";
+import hospitalBedsRoutes from "./hospitalBedsRoutes.js"
 
 const router = Router();
 
 router.use("/patients", patientRoutes);
-router.use("/teste", (req, res) => res.send("teste2"))
-router.use("/teste2", (req, res) => res.send("teste3"))
+
+router.use("/hospital-beds", hospitalBedsRoutes);
 
 export default router; 

@@ -9,5 +9,6 @@ export async function getInfos() {
         return result.rows;
     } finally {
         await conn.close();
-    }
-}
+    };
+};
+

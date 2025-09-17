@@ -7,7 +7,8 @@ let pool;
 
 export async function initDB() {
     try {
-        oracledb.initOracleClient({ libDir: ''})
+        oracledb.initOracleClient({ libDir: process.env.DB_DIR});
+
         pool = await oracledb.createPool({
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
@@ -16,7 +17,7 @@ export async function initDB() {
             poolMax: 5,
             poolIncrement: 1,
         });
-        console.log("Pool OracleDB criada");
+        console.log("Pool OracleDB criada:", process.env.DB_DIR);
     } catch (err) {
         console.error("Erro ao criar o Pool OracleDB", err);
         process.exit(1);

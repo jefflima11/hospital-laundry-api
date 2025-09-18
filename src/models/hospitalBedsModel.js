@@ -2,6 +2,7 @@ import { getConnection } from "../config/db.js";
 
 export async function getHospitalBeds() {
     const conn = await getConnection();
+
     try {
         const result = await conn.execute(
             `SELECT cd_leito, ds_resumo
@@ -16,6 +17,7 @@ export async function getHospitalBeds() {
 
 export async function getHospitalBedsId(id) {
     const conn = await getConnection();
+
     try{
         let query = "";
         let binds = {};
@@ -117,4 +119,17 @@ export async function getCleaningHospitalBeds(post) {
     } finally{
         await conn.close();
     };
-}
+};
+
+export async function patchCleaningRequest(request) {
+    const conn = await getConnection();
+
+    try {
+        const result = await conn.execute(`
+            select sysdate from dual`
+        );
+        return result.rows;
+    } finally {
+        await conn.close;
+    };
+};

@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 3005;
 
 app.listen(PORT, async () => {
     await initDB();
-    console.log(`Servidor rodando na porta ${PORT}`);
+    console.log(`Servidor rodando!`);
 });
 
 

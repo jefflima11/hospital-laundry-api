@@ -17,7 +17,7 @@ export async function initDB() {
             poolMax: 5,
             poolIncrement: 1,
         });
-        console.log("Pool OracleDB criada:", process.env.DB_DIR);
+        console.log("Pool OracleDB criada");
     } catch (err) {
         console.error("Erro ao criar o Pool OracleDB", err);
         process.exit(1);

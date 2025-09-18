@@ -8,3 +8,19 @@ export async function getInfos(req, res, next) {
         next(err);
     }
 }
+
+export async function getStatusLaundry(req, res, next) {
+    try {
+        const text = [
+            ['PARA HIGIENIZACAO'],
+            ['EM HIGIENIZACAO'],
+            ['POS HIGIENIZACAO'],
+            ['MANUTENCAO'],
+            ['ROUPARIA']
+        ];
+        res.json(text)
+    } catch (err) {
+        next (err);
+    };
+};
+

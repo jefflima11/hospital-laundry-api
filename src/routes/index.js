@@ -16,6 +16,6 @@ router.use("/patients",authMiddleware, patientRoutes);
 
 router.use("/hospital-beds",authMiddleware, hospitalBedsRoutes);
 
-router.use("/infos", authMiddleware, infoRoutes)
+router.use("/infos", authMiddleware, infoRoutes);
 
 export default router; 

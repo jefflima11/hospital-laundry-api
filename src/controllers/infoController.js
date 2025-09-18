@@ -1,9 +1,13 @@
 import { getInfos as getInfosModel } from "../models/infoModel.js";
 
 export async function getInfos(req, res, next) {
+    
     try {
         const infos = await getInfosModel();
-        res.json(infos);
+        res.json({
+            empresa: infos[0][0], 
+            userLogged: req.user.user
+        });
     } catch (err) {
         next(err);
     }

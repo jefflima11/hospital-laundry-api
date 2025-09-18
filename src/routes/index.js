@@ -8,13 +8,13 @@ import userRoutes from "./userRoutes.js";
 
 const router = Router();
 
-router.use("/users", userRoutes);
-
 router.post("/login", login)
 
-router.use("/patients", patientRoutes);
+router.use("/users",authMiddleware, userRoutes);
 
-router.use("/hospital-beds", hospitalBedsRoutes);
+router.use("/patients",authMiddleware, patientRoutes);
+
+router.use("/hospital-beds",authMiddleware, hospitalBedsRoutes);
 
 router.use("/infos", authMiddleware, infoRoutes)
 

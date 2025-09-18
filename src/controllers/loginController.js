@@ -24,18 +24,15 @@ export async function login(req, res, next) {
             return res.status(401).json({ message: "Usuário não encontrado" });
         }
 
-        // Oracle retorna um array, ex: [ "joao", "hashAqui" ]
         const [cd_usuario, hashedPassword] = result.rows[0];
 
-        // Verifica senha com bcrypt
         const valid = await bcrypt.compare(password, hashedPassword);
         if (!valid) {
             return res.status(401).json({ message: "Senha incorreta" });
         }
 
-        // Gera o token JWT
         const token = jwt.sign(
-            { user: cd_usuario },  // payload simples
+            { user: cd_usuario },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );

@@ -1,47 +1,36 @@
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
-import { getConnection } from "../config/db.js";
+import { postLogin as postLoginModel, patchAlterarSenha as patchAlterarSenhaModel, patchInativarUsuario as patchInativarUsuarioModel, deleteExcluirUsuario as deleteExcluirUsuarioModel } from "../models/loginModel.js";
 
-export async function login(req, res, next) {
+export async function postLogin(req, res, next) {
     const { username, password } = req.body;
 
-    if (!username || !password) {
-        return res.status(400).json({ message: "Usuário e senha são obrigatórios" });
-    }
-
-    const conn = await getConnection();
-
     try {
-        // Busca no banco pelo CD_USUARIO
-        const result = await conn.execute(
-            `SELECT CD_USUARIO, PASSWORD
-             FROM DBAHUMS.USERS
-             WHERE CD_USUARIO = :username`,
-            { username }
-        );
-
-        if (result.rows.length === 0) {
-            return res.status(401).json({ message: "Usuário não encontrado" });
-        }
-
-        const [cd_usuario, hashedPassword] = result.rows[0];
-
-        const valid = await bcrypt.compare(password, hashedPassword);
-        if (!valid) {
-            return res.status(401).json({ message: "Senha incorreta" });
-        }
-
-        const token = jwt.sign(
-            { user: cd_usuario },
-            process.env.JWT_SECRET,
-            { expiresIn: "1h" }
-        );
-
-        return res.json({ token });
-
+        const login = await postLoginModel(username, password);
+        res.json(login);
     } catch (err) {
         next(err);
-    } finally {
-        await conn.close();
+    };
+};
+
+export async function patchAlterarSenha(req, res, next) {
+    try {
+        res.json("ainda por vir!");
+    } catch (err) {
+        next(err);
+    }
+};
+
+export async function patchInativarUsuario(req, res, next) {
+    try {
+        res.json("ainda por vir!");
+    } catch (err) {
+        next(err);
+    }
+};
+
+export async function deleteExcluirUsuario(req, res, next) {
+    try {
+        res.json("ainda por vir!");
+    } catch (err) {
+        next(err);
     }
 }

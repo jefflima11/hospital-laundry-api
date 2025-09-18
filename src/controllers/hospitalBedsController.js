@@ -4,7 +4,6 @@ export async function getHospitalBeds(req, res, next) {
     try {
         const beds = await getHospitalBedsModel();
         res.json(beds);
-        // res.json("teste");
     } catch (err) {
         next(err);
     };

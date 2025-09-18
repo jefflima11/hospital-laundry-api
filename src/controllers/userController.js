@@ -5,7 +5,7 @@ export async function createUser(req, res, next) {
     const { username, password, name } = req.body;
 
     if (!username || !password || !name) {
-        return res.status(400).json({ message: "Username e/ou password são obrrigatórios" });
+        return res.status(400).json({ message: "Usuario e senha são obrigatórios" });
     }
 
     const conn = await getConnection();

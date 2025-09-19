@@ -229,6 +229,7 @@ export async function getCleaningRequest() {
                 sn_realizado = 'N'
                 And sn_lib_limpeza_auto = 'N'
                 And dt_cancelamento Is Null
+                And dt_hr_ini_pos_higieniza Is Null
             Order By
                 2 Desc      
         `);
@@ -237,4 +238,15 @@ export async function getCleaningRequest() {
     } finally {
         await conn.close();
     }
+};
+
+export async function confirmCleaningRequest(request) {
+    const conn = await getConnection();
+
+    try {
+        
+    } finally {
+
+    };
+
 };

@@ -1,4 +1,4 @@
-import { getHospitalBeds as getHospitalBedsModel, getHospitalBedsId as getHospitalBedsIdModel, getHospitalBedsStatus as getHospitalBedsStatusModel, getCleaningHospitalBeds as getCleaningHospitalBedsModel, patchCleaningRequest as patchCleaningRequestModel} from "../models/hospitalBedsModel.js"
+import { getHospitalBeds as getHospitalBedsModel, getHospitalBedsId as getHospitalBedsIdModel, getHospitalBedsStatus as getHospitalBedsStatusModel, getCleaningHospitalBeds as getCleaningHospitalBedsModel, patchCleaningRequest as patchCleaningRequestModel, getCleaningRequest as getCleaningRequestModel} from "../models/hospitalBedsModel.js"
 
 export async function getHospitalBeds(req, res, next) {
     try {
@@ -49,4 +49,13 @@ export async function patchCleaningRequest(req, res, next) {
     } catch(err) {
         next(err);
     };
+}
+
+export async function getCleaningRequest(req, res, next) {
+    try {
+        const cleaningRequests = await getCleaningRequestModel();
+        res.json(cleaningRequests)
+    } catch (err) {
+        next(err);
+    }
 }

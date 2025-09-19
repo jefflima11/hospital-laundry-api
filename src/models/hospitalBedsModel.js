@@ -1,13 +1,34 @@
 import { getConnection } from "../config/db.js";
+import oracledb from "oracledb";
 
 export async function getHospitalBeds() {
     const conn = await getConnection();
 
     try {
-        const result = await conn.execute(
-            `SELECT cd_leito, ds_resumo
-             FROM dbamv.leito 
-             WHERE dt_desativacao is null`
+        const result = await conn.execute(`
+            SELECT 
+                Case
+                    When Substr(l.ds_leito,1,3) = 'APT' then 'APARTAMENTO '||Substr(l.ds_leito,4)
+                    When Substr(l.ds_leito,1,3) = 'ENF' Then 'ENFERMARIA '||Substr(Substr(l.ds_leito,4),1,3)||' - '||Substr(l.ds_leito,7)
+                    When Substr(l.ds_leito,1,3) = 'UTI' Then 'U.T.I - LEITO '||Substr(l.ds_leito,5,2)
+                    Else ds_leito
+                End ds_leito,
+                Decode(l.tp_ocupacao,'O','OCUPADO'
+                                    ,'V','VAGO'
+                                    ,'N','INTERDICAO'
+                                    ,'T','INTERDITADO TEMPORARIAMENTE'
+                                    ,'R','OCUPADO POR RESERVA'
+                                    ,'L','EM LIMPEZA'
+                                    ,'I','OCUPADO POR INFECCAO'
+                                    ,'E','REFORMA'
+                                    ,'M','MANUTENCAO'
+                                    ,'C','INTERDITADO POR INFECCAO'
+                                    ,'A','ACOMPANHANTE'
+                                    ,l.tp_ocupacao
+                ) tp_ocupacao
+            FROM 
+                dbamv.leito l
+            WHERE dt_desativacao is null`
         );
         return result.rows;
     } finally {
@@ -126,10 +147,94 @@ export async function patchCleaningRequest(request) {
 
     try {
         const result = await conn.execute(`
-            select sysdate from dual`
+            Select 
+                dt_inicio_higieniza,
+                dt_hr_ini_rouparia,
+                dt_hr_ini_pos_higieniza
+            From
+                dbamv.solic_limpeza
+            where
+                cd_solic_limpeza = :request`, 
+            { request },
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
-        return result.rows;
+
+        if (result.rows[0]["DT_INICIO_HIGIENIZA"] === null) {
+            await conn.execute(`
+                UPDATE dbamv.solic_limpeza
+                SET DT_INICIO_HIGIENIZA = sysdate,
+                    HR_INICIO_HIGIENIZA = sysdate,
+                    DT_HR_FIM_AG_HIGIENIZA = sysdate,
+                    DT_HR_INI_ROUPARIA = sysdate,
+                    DT_HR_FIM_ROUPARIA = sysdate
+                WHERE
+                    cd_solic_limpeza = :request`, 
+                { request },
+                { autoCommit: true}
+            );
+
+            return "Solicitação alterada para EM HIGIENIZAÇÂO"
+        } else if (result.rows[0]["DT_HR_INI_ROUPARIA"] === null) {
+        //   Ainda não usado sistema de rouparia
+        } else if (result.rows[0]["DT_HR_INI_POS_HIGIENIZA"] === null) {
+            await conn.execute(`
+                UPDATE dbamv.solic_limpeza
+                SET DT_HR_FIM_HIGIENIZA = sysdate,
+                    DT_HR_INI_POS_HIGIENIZA = sysdate
+                WHERE
+                    cd_solic_limpeza = :request`,
+                { request },
+                { autoCommit: true}
+            );
+
+            return "Solicitação alterada para POS-HIGIENIZACAO";
+        }
+
     } finally {
         await conn.close;
     };
+};
+
+export async function getCleaningRequest() {
+    const conn = await getConnection();
+
+    try {
+        const result = await conn.execute(`
+            Select
+                ds_unid_int,
+                Case 
+                    When dt_inicio_higieniza Is Null And dt_hr_ini_rouparia Is Null And dt_hr_ini_pos_higieniza Is Null Then 'PARA HIGIENIZACAO'
+                    When dt_inicio_higieniza Is Not Null And dt_hr_ini_rouparia Is Not Null And dt_hr_ini_pos_higieniza Is Null Then 'EM HIGIENIZACAO'
+                    When dt_inicio_higieniza Is Not Null And dt_hr_ini_rouparia Is Not Null And dt_hr_ini_pos_higieniza Is Not Null Then 'POS HIGIENIZACAO'
+                    Else 'N/A'
+                End status,
+                Case
+                    When Substr(l.ds_leito,1,3) = 'APT' then 'APARTAMENTO '||Substr(l.ds_leito,4)
+                    When Substr(l.ds_leito,1,3) = 'ENF' Then 'ENFERMARIA '||Substr(Substr(l.ds_leito,4),1,3)||' - '||Substr(l.ds_leito,7)
+                    When Substr(l.ds_leito,1,3) = 'UTI' Then 'U.T.I - LEITO '||Substr(l.ds_leito,5,2)
+                    Else
+                    ds_leito
+                End ds_leito,
+                cd_solic_limpeza,                
+                dt_solic_limpeza,
+                p.nm_paciente
+                
+            From
+                dbamv.solic_limpeza sl
+                Inner Join dbamv.leito l On sl.cd_leito = l.cd_leito
+                Inner Join dbamv.unid_int ui On l.cd_unid_int = ui.cd_unid_int
+                Inner join dbamv.atendime a on sl.cd_atendimento = a.cd_atendimento
+                Inner join dbamv.paciente p on a.cd_paciente = p.cd_paciente
+            Where
+                sn_realizado = 'N'
+                And sn_lib_limpeza_auto = 'N'
+                And dt_cancelamento Is Null
+            Order By
+                2 Desc      
+        `);
+
+        return result.rows;
+    } finally {
+        await conn.close();
+    }
 };

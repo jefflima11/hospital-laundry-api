@@ -240,13 +240,28 @@ export async function getCleaningRequest() {
     }
 };
 
-export async function confirmCleaningRequest(request) {
+export async function confirmCleaningRequest(request, employee) {
     const conn = await getConnection();
 
     try {
-        
-    } finally {
+        await conn.execute(`
+            UPDATE dbamv.solic_limpeza
+            SET DT_REALIZADO = sysdate,
+                HR_REALIZADO = sysdate,
+                DT_HR_FIM_POS_HIGIENIZA = sysdate,
+                SN_REALIZADO = 'S',
+                CD_FUNC = :employee,
+                DS_OBSERVACAO = 'TESTE 001'
+            WHERE
+                cd_solic_limpeza = :request
+                `,
+            { request, employee },
+            { autoCommit: true}    
+        );
 
+        return `Confirmação de limpeza realizada: ${request}`
+    } finally {
+        await conn.close();
     };
 
 };

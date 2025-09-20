@@ -31,7 +31,7 @@ export async function postLogin(username, password) {
         const token = jwt.sign(
             { user: cd_usuario },
             process.env.JWT_SECRET,
-            { expiresIn: "1h" }
+            { expiresIn: "5h" }
         );
 
         return ({ token });

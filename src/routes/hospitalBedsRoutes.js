@@ -13,6 +13,6 @@ router.get("/status/:post", getCleaningHospitalBeds);
 router.get("/cleaning-request", getCleaningRequest);
 router.patch("/cleaning-request/:request", patchCleaningRequest);
 
-router.patch("/confirm-cleaning-request/", confirmCleaningRequest);
+router.patch("/confirm-cleaning-request/:request/:employee", confirmCleaningRequest);
 
 export default router;

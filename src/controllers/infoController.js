@@ -1,4 +1,4 @@
-import { getInfos as getInfosModel } from "../models/infoModel.js";
+import { getInfos as getInfosModel, getEmployee as getEmployeeModel } from "../models/infoModel.js";
 
 export async function getInfos(req, res, next) {
     
@@ -28,3 +28,13 @@ export async function getStatusLaundry(req, res, next) {
     };
 };
 
+export async function getEmployee(req, res, next) {
+
+    try{
+        const employees = await getEmployeeModel();
+        
+        res.json(employees);
+    } catch(err) {
+        next(err);
+    }
+}

@@ -136,7 +136,7 @@ export async function getCleaningHospitalBeds(post) {
             { post }
         ); 
         
-        return result.rows;
+        return checkEmployee.rows;
     } finally{
         await conn.close();
     };
@@ -176,7 +176,7 @@ export async function patchCleaningRequest(request) {
             return "Solicitação alterada para EM HIGIENIZAÇÂO"
         } else if (result.rows[0]["DT_HR_INI_ROUPARIA"] === null) {
             //   Ainda não usado sistema de rouparia
-        } else if (result.rows[0]["DT_HR_INI_POS_HIGIENIZA"] === null) {
+        } else if (checkEmployee.rows[0]["DT_HR_INI_POS_HIGIENIZA"] === null) {
             await conn.execute(`
                 UPDATE dbamv.solic_limpeza
                 SET DT_HR_FIM_HIGIENIZA = sysdate,
@@ -242,42 +242,59 @@ export async function getCleaningRequest() {
     }
 };
 
-export async function confirmCleaningRequest(request, employee) {
+export async function confirmCleaningRequest(request, binds) {
+    const {employee, observation} = binds
+    
+    if (!request || !employee) {
+        return `Solicitação e funcionario são obrigatórios`;
+    };
+    
     const conn = await getConnection();
 
     try {
 
-        const result = await conn.execute(`
-            SELECT 1
-            FROM
-                dbamv.funcionario f
-                Inner join dbamv.func_espec fe on f.cd_func = fe.cd_func
-            WHERE
-                f.cd_func = :employee
-                and fe.cd_espec = 40`,
-            { employee }
+        const checkRequest = await conn.execute(`
+            SELECT sn_realizado FROM dbamv.solic_limpeza WHERE cd_solic_limpeza = :request`,
+            { request }
         );
 
-        if (result.rows == 1) {
+        if (checkRequest.rows == 'S') {
+            return "Solicitação já confirmada!";
 
-             await conn.execute(`
-            UPDATE dbamv.solic_limpeza
-            SET DT_REALIZADO = sysdate,
-                HR_REALIZADO = sysdate,
-                DT_HR_FIM_POS_HIGIENIZA = sysdate,
-                SN_REALIZADO = 'S',
-                CD_FUNC = :employee,
-                DS_OBSERVACAO = 'TESTE 001'
-            WHERE
-                cd_solic_limpeza = :request
-                `,
-            { request, employee },
-            { autoCommit: true}    
-        );
-
-            return `Confirmação de limpeza realizada: ${result.rows}`
         } else {
-            return `Funcionario informado não autorizado para higienização!`;
+            const checkEmployee = await conn.execute(`
+                SELECT 1
+                FROM
+                    dbamv.funcionario f
+                    Inner join dbamv.func_espec fe on f.cd_func = fe.cd_func
+                WHERE
+                    f.cd_func = :employee
+                    and fe.cd_espec = 40`,
+                { employee }
+            );
+    
+            if (checkEmployee.rows > 0) {
+    
+                 await conn.execute(`
+                UPDATE dbamv.solic_limpeza
+                SET DT_REALIZADO = sysdate,
+                    HR_REALIZADO = sysdate,
+                    DT_HR_FIM_POS_HIGIENIZA = sysdate,
+                    SN_REALIZADO = 'S',
+                    CD_FUNC = :employee,
+                    DS_OBSERVACAO = :observation
+                WHERE
+                    cd_solic_limpeza = :request
+                    `,
+                { request, employee, observation },
+                { autoCommit: true}    
+            );
+    
+                return `Confirmação de limpeza realizada`
+            } else {
+                return `Funcionario informado não autorizado para higienização!`;
+            }
+            
         }
 
     } finally {

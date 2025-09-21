@@ -61,11 +61,15 @@ export async function getCleaningRequest(req, res, next) {
 };
 
 export async function confirmCleaningRequest(req, res, next) {
-    const { request, employee } = req.params
+
+    const { request } = req.params;
+
+    const binds = req.body;
 
     try {
-        const confirmRequests = await confirmCleaningRequestModel(request, employee);
+        const confirmRequests = await confirmCleaningRequestModel(request, binds);
         res.json(confirmRequests);
+
     } catch(err) {
         next(err)
     };

@@ -176,7 +176,7 @@ export async function patchCleaningRequest(request) {
             return "Solicitação alterada para EM HIGIENIZAÇÂO"
         } else if (result.rows[0]["DT_HR_INI_ROUPARIA"] === null) {
             //   Ainda não usado sistema de rouparia
-        } else if (checkEmployee.rows[0]["DT_HR_INI_POS_HIGIENIZA"] === null) {
+        } else if (result.rows[0]["DT_HR_INI_POS_HIGIENIZA"] === null) {
             await conn.execute(`
                 UPDATE dbamv.solic_limpeza
                 SET DT_HR_FIM_HIGIENIZA = sysdate,
@@ -301,4 +301,47 @@ export async function confirmCleaningRequest(request, binds) {
         await conn.close();
     };
 
+};
+
+export async function refuseCleaningRequest(request) {
+    const conn = await getConnection();
+
+    try {
+
+        const verifyRequest = await conn.execute(`
+            SELECT
+                DT_HR_INI_POS_HIGIENIZA
+            FROM
+                dbamv.solic_limpeza
+            WHERE
+                cd_solic_limpeza = :request`,
+            { request }
+        );
+
+
+        if (verifyRequest.rows[0][0] === null) {
+            return ('Solicitação não se encontra em POS-HIGIENIZACAO para confirmação');
+        } else {
+            await conn.execute(`
+                UPDATE dbamv.solic_limpeza
+                SET DT_INICIO_HIGIENIZA = null,
+                    HR_INICIO_HIGIENIZA = null,
+                    DT_HR_FIM_AG_HIGIENIZA = null,
+                    DT_HR_INI_ROUPARIA = null,
+                    DT_HR_FIM_ROUPARIA = null,
+                    DT_HR_FIM_HIGIENIZA = null,
+                    DT_HR_INI_POS_HIGIENIZA = NULL,
+                    DS_OBSERVACAO = '**REPROVADA NO PÓS LIMPEZA***DATA/HORA'||' '||to_char(sysdate,'dd/mm/yyyy HH24:MI')||' '||'USUÁRIO: '||USER
+                WHERE
+                    cd_solic_limpeza = :request`,
+                { request },
+                { autoCommit: true}
+            );
+            return "Solicitação recusada!";
+        }
+
+
+    } finally {
+        await conn.close();
+    }
 };

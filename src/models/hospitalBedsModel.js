@@ -175,7 +175,7 @@ export async function patchCleaningRequest(request) {
 
             return "Solicitação alterada para EM HIGIENIZAÇÂO"
         } else if (result.rows[0]["DT_HR_INI_ROUPARIA"] === null) {
-        //   Ainda não usado sistema de rouparia
+            //   Ainda não usado sistema de rouparia
         } else if (result.rows[0]["DT_HR_INI_POS_HIGIENIZA"] === null) {
             await conn.execute(`
                 UPDATE dbamv.solic_limpeza
@@ -188,6 +188,8 @@ export async function patchCleaningRequest(request) {
             );
 
             return "Solicitação alterada para POS-HIGIENIZACAO";
+        } else {
+            return "Solicitação já se encontra em POS-HIGIENIZACAO para confirmação."
         }
 
     } finally {
@@ -244,7 +246,21 @@ export async function confirmCleaningRequest(request, employee) {
     const conn = await getConnection();
 
     try {
-        await conn.execute(`
+
+        const result = await conn.execute(`
+            SELECT 1
+            FROM
+                dbamv.funcionario f
+                Inner join dbamv.func_espec fe on f.cd_func = fe.cd_func
+            WHERE
+                f.cd_func = :employee
+                and fe.cd_espec = 40`,
+            { employee }
+        );
+
+        if (result.rows == 1) {
+
+             await conn.execute(`
             UPDATE dbamv.solic_limpeza
             SET DT_REALIZADO = sysdate,
                 HR_REALIZADO = sysdate,
@@ -259,7 +275,11 @@ export async function confirmCleaningRequest(request, employee) {
             { autoCommit: true}    
         );
 
-        return `Confirmação de limpeza realizada: ${request}`
+            return `Confirmação de limpeza realizada: ${result.rows}`
+        } else {
+            return `Funcionario informado não autorizado para higienização!`;
+        }
+
     } finally {
         await conn.close();
     };

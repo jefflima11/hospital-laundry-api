@@ -30,7 +30,10 @@ export async function getHospitalBeds() {
             FROM 
                 dbamv.leito l
                 inner join dbamv.unid_int ui on l.cd_unid_int = ui.cd_unid_int
-            WHERE l.dt_desativacao is null`
+            WHERE 
+                l.dt_desativacao is null
+                and l.cd_tip_acom in (1,2,8)
+                and l.sn_extra = 'N'`
         );
         return result.rows;
     } finally {
@@ -138,7 +141,7 @@ export async function getCleaningHospitalBeds(post) {
             { post }
         ); 
         
-        return checkEmployee.rows;
+        return result.rows;
     } finally{
         await conn.close();
     };

@@ -7,6 +7,7 @@ export async function getHospitalBeds() {
     try {
         const result = await conn.execute(`
             SELECT 
+                ui.ds_unid_int,
                 Case
                     When Substr(l.ds_leito,1,3) = 'APT' then 'APARTAMENTO '||Substr(l.ds_leito,4)
                     When Substr(l.ds_leito,1,3) = 'ENF' Then 'ENFERMARIA '||Substr(Substr(l.ds_leito,4),1,3)||' - '||Substr(l.ds_leito,7)
@@ -28,7 +29,8 @@ export async function getHospitalBeds() {
                 ) tp_ocupacao
             FROM 
                 dbamv.leito l
-            WHERE dt_desativacao is null`
+                inner join dbamv.unid_int ui on l.cd_unid_int = ui.cd_unid_int
+            WHERE l.dt_desativacao is null`
         );
         return result.rows;
     } finally {

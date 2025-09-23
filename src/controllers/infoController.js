@@ -1,7 +1,6 @@
 import { getInfos as getInfosModel, getEmployee as getEmployeeModel } from "../models/infoModel.js";
 
 export async function getInfos(req, res, next) {
-    
     try {
         const infos = await getInfosModel();
         res.json({

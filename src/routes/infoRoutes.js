@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { getInfos, getStatusLaundry, getEmployee } from "../controllers/infoController.js";
+import path from "path";
 
 const router = Router();
 
@@ -15,6 +16,29 @@ const router = Router();
  *         description: Informaão da empresa e do usuario logado
  */
 router.get("/", getInfos);
+
+/**
+ * @openapi
+ * /api/infos/image:
+ *   get:
+ *     summary: Logo
+ *     tags:
+ *       - informações gerais
+ *     responses:
+ *       200:
+ *         description: Retorna a logo
+ *       404:
+ *         description: imagem não encontrada
+ */
+router.get("/image", (req, res) => {
+  const imgPath = path.join(process.cwd(), "src/img/logo.png");
+  res.sendFile(imgPath, (err) => {
+    if (err) {
+      res.status(404).send("Imagem não encontrada");
+    }
+  });
+});
+
 
 /**
  * @openapi

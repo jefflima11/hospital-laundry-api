@@ -8,7 +8,6 @@ import swaggerUi from "swagger-ui-express";
 
 const app = express();
 
-
 app.use(express.json());
 app.use(express.urlencoded({ extend: true}));
 app.use(cors());
@@ -39,7 +38,6 @@ const options = {
 }
 
 const swaggerSpec = swaggerJsdoc(options);
-
 
 app.use("/api", routes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));

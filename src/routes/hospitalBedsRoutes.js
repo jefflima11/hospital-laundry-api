@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getHospitalBeds, getHospitalBedsId, getHospitalBedsStatus, getCleaningHospitalBeds, patchCleaningRequest, getCleaningRequest, confirmCleaningRequest, refuseCleaningRequest } from "../controllers/HospitalBedsController.js";
+import { getHospitalBeds, getHospitalBedsId, getHospitalBedsStatus, getCleaningHospitalBeds, patchCleaningRequest, getCleaningRequest, confirmCleaningRequest, refuseCleaningRequest, getRequestWaitingConfirmation } from "../controllers/HospitalBedsController.js";
 
 const router = Router();
 
@@ -82,6 +82,19 @@ router.get("/status/:post", getCleaningHospitalBeds);
  *         description: Retorna as solicitações de limpeza que não estão aguardando confirmação
  */
 router.get("/cleaning-request", getCleaningRequest);
+
+/**
+ * @openapi
+ * /api/hospital-beds/request-waiting-confirmation:
+ *   get:
+ *     summary: Busca as solicitações de limpeza em pos-higienização
+ *     tags:
+ *       - Solicitações de limpeza
+ *     responses:
+ *       200:
+ *         description: Retorna as solicitações de limpeza que estão aguardando confirmação
+ */
+router.get("/request-waiting-confirmation", getRequestWaitingConfirmation)
 
 /**
  * @openapi

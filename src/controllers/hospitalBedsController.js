@@ -1,4 +1,4 @@
-import { getHospitalBeds as getHospitalBedsModel, getHospitalBedsId as getHospitalBedsIdModel, getHospitalBedsStatus as getHospitalBedsStatusModel, getCleaningHospitalBeds as getCleaningHospitalBedsModel, patchCleaningRequest as patchCleaningRequestModel, getCleaningRequest as getCleaningRequestModel, confirmCleaningRequest as confirmCleaningRequestModel, refuseCleaningRequest as refuseCleaningRequestModel} from "../models/hospitalBedsModel.js"
+import { getHospitalBeds as getHospitalBedsModel, getHospitalBedsId as getHospitalBedsIdModel, getHospitalBedsStatus as getHospitalBedsStatusModel, getCleaningHospitalBeds as getCleaningHospitalBedsModel, patchCleaningRequest as patchCleaningRequestModel, getCleaningRequest as getCleaningRequestModel, confirmCleaningRequest as confirmCleaningRequestModel, refuseCleaningRequest as refuseCleaningRequestModel, getRequestWaitingConfirmation as getRequestWaitingConfirmationModel} from "../models/hospitalBedsModel.js"
 
 export async function getHospitalBeds(req, res, next) {
     try {
@@ -84,4 +84,13 @@ export async function refuseCleaningRequest(req, res, next) {
     } catch (err) {
         next(err);
     };
-;}
+};
+
+export async function getRequestWaitingConfirmation(req, res, next) {
+    try{
+        const result = await getRequestWaitingConfirmationModel();
+        res.json(result);
+    } catch(err)  {
+        next(err);
+    };
+};

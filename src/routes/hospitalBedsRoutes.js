@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { getHospitalBeds, getHospitalBedsId, getHospitalBedsStatus, getCleaningHospitalBeds, patchCleaningRequest, getCleaningRequest, confirmCleaningRequest, refuseCleaningRequest, getRequestWaitingConfirmation } from "../controllers/HospitalBedsController.js";
+import { authorize } from "../middlewares/authorize.js"
 
 const router = Router();
 
@@ -94,7 +95,7 @@ router.get("/cleaning-request", getCleaningRequest);
  *       200:
  *         description: Retorna as solicitações de limpeza que estão aguardando confirmação
  */
-router.get("/request-waiting-confirmation", getRequestWaitingConfirmation)
+router.get("/request-waiting-confirmation", authorize(["A","L"]), getRequestWaitingConfirmation)
 
 /**
  * @openapi

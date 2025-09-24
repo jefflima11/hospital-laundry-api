@@ -16,7 +16,7 @@ const router = Router();
  *       200:
  *         description: Informaão da empresa e do usuario logado
  */
-router.get("/", authorize(["A"]), getInfos);
+router.get("/", authorize(["N"]), getInfos);
 
 /**
  * @openapi
@@ -31,7 +31,7 @@ router.get("/", authorize(["A"]), getInfos);
  *       404:
  *         description: imagem não encontrada
  */
-router.get("/image", authorize(["A"]), (req, res) => {
+router.get("/image", authorize(["A","N","L"]), (req, res) => {
   const imgPath = path.join(process.cwd(), "src/img/logo.png");
   res.sendFile(imgPath, (err) => {
     if (err) {
@@ -64,6 +64,6 @@ router.get("/status-laundry", authorize(["A"]), getStatusLaundry);
  *       200:
  *         description: Retorna os usuarios cadastrados para atender solicitações de higienização
  */
-router.get("/employee", authorize(["A"]), getEmployee)
+router.get("/employee", authorize(["A","L"]), getEmployee)
 
 export default router;

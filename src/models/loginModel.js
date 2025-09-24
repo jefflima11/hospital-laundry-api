@@ -28,13 +28,13 @@ export async function postLogin(username, password) {
             throw new Error({ message: "Senha incorreta" });
         }
 
-        const token = jwt.sign(
+        const tokens = jwt.sign(
             { user: cd_usuario, role: role},
             process.env.JWT_SECRET,
             { expiresIn: "5h" }
         );
 
-        return ({ token });
+        return ({ tokens, role });
 
     } finally {
         await conn.close();

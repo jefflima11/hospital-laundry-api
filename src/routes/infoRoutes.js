@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { getInfos, getStatusLaundry, getEmployee } from "../controllers/infoController.js";
 import path from "path";
+import { authorize } from "../middlewares/authorize.js"
 
 const router = Router();
 
@@ -15,7 +16,7 @@ const router = Router();
  *       200:
  *         description: Informaão da empresa e do usuario logado
  */
-router.get("/", getInfos);
+router.get("/", authorize(["A"]), getInfos);
 
 /**
  * @openapi
@@ -30,7 +31,7 @@ router.get("/", getInfos);
  *       404:
  *         description: imagem não encontrada
  */
-router.get("/image", (req, res) => {
+router.get("/image", authorize(["A"]), (req, res) => {
   const imgPath = path.join(process.cwd(), "src/img/logo.png");
   res.sendFile(imgPath, (err) => {
     if (err) {
@@ -38,7 +39,6 @@ router.get("/image", (req, res) => {
     }
   });
 });
-
 
 /**
  * @openapi
@@ -51,7 +51,7 @@ router.get("/image", (req, res) => {
  *       200:
  *         description: Todos os status de limpeza
  */
-router.get("/status-laundry", getStatusLaundry);
+router.get("/status-laundry", authorize(["A"]), getStatusLaundry);
 
 /**
  * @openapi
@@ -64,6 +64,6 @@ router.get("/status-laundry", getStatusLaundry);
  *       200:
  *         description: Retorna os usuarios cadastrados para atender solicitações de higienização
  */
-router.get("/employee", getEmployee)
+router.get("/employee", authorize(["A"]), getEmployee)
 
 export default router;

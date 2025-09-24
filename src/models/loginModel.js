@@ -11,7 +11,7 @@ export async function postLogin(username, password) {
 
     try {
         const result = await conn.execute(
-            `SELECT CD_USUARIO, PASSWORD
+            `SELECT CD_USUARIO, PASSWORD, ROLE
              FROM DBAHUMS.USERS
              WHERE CD_USUARIO = :username`,
             { username }
@@ -21,7 +21,7 @@ export async function postLogin(username, password) {
             throw new Error({ message: "Usuário não encontrado" });
         }
 
-        const [cd_usuario, hashedPassword] = result.rows[0];
+        const [cd_usuario, hashedPassword, role] = result.rows[0];
 
         const valid = await bcrypt.compare(password, hashedPassword);
         if (!valid) {
@@ -29,7 +29,7 @@ export async function postLogin(username, password) {
         }
 
         const token = jwt.sign(
-            { user: cd_usuario },
+            { user: cd_usuario, role: role},
             process.env.JWT_SECRET,
             { expiresIn: "5h" }
         );

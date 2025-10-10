@@ -16,7 +16,7 @@ const router = Router();
  *       200:
  *         description: Informaão da empresa e do usuario logado
  */
-router.get("/", authorize(["N"]), getInfos);
+router.get("/", getInfos);
 
 /**
  * @openapi
@@ -31,7 +31,7 @@ router.get("/", authorize(["N"]), getInfos);
  *       404:
  *         description: imagem não encontrada
  */
-router.get("/image", authorize(["A","N","L"]), (req, res) => {
+router.get("/image", (req, res) => {
   const imgPath = path.join(process.cwd(), "src/img/logo.png");
   res.sendFile(imgPath, (err) => {
     if (err) {

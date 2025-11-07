@@ -1,4 +1,13 @@
-import { postLogin as postLoginModel, patchAlterarSenha as patchAlterarSenhaModel, patchInativarUsuario as patchInativarUsuarioModel, deleteExcluirUsuario as deleteExcluirUsuarioModel } from "../models/loginModel.js";
+import { postLogin as postLoginModel, getAllUsers as getAllUsersModel, patchInativarUsuario as patchInativarUsuarioModel, patchAlterarSenha as patchAlterarSenhaModel } from "../models/loginModel.js";
+
+export async function getAllUsers(req, res, next) {
+    try {
+        const users = await getAllUsersModel();
+        res.json(users);
+    } catch (err) {
+        next(err);
+    }   
+};
 
 export async function postLogin(req, res, next) {
     const { username, password } = req.body;
@@ -13,7 +22,8 @@ export async function postLogin(req, res, next) {
 
 export async function patchAlterarSenha(req, res, next) {
     try {
-        res.json("ainda por vir!");
+        const changePassword = await patchAlterarSenhaModel(req.body);
+        res.json(changePassword);
     } catch (err) {
         next(err);
     }
@@ -21,16 +31,9 @@ export async function patchAlterarSenha(req, res, next) {
 
 export async function patchInativarUsuario(req, res, next) {
     try {
-        res.json("ainda por vir!");
+        const inactivate = await patchInativarUsuarioModel(req.params.userName);
+        res.json(inactivate);
     } catch (err) {
         next(err);
     }
 };
-
-export async function deleteExcluirUsuario(req, res, next) {
-    try {
-        res.json("ainda por vir!");
-    } catch (err) {
-        next(err);
-    }
-}

@@ -16,7 +16,8 @@ export async function postLogin(req, res, next) {
         const login = await postLoginModel(username, password);
         res.json(login);
     } catch (err) {
-        next(err);
+        // next(err);
+        res.status(401).json({ error: "Credenciais invalidas" });
     };
 };
 
@@ -25,7 +26,7 @@ export async function patchAlterarSenha(req, res, next) {
         const changePassword = await patchAlterarSenhaModel(req.body);
         res.json(changePassword);
     } catch (err) {
-        next(err);
+        res.status(400).json({ error: err.message });
     }
 };
 

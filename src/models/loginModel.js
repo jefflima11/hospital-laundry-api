@@ -44,15 +44,41 @@ export async function postLogin(username, password) {
 export async function patchAlterarSenha(req) {
     const conn = await getConnection();
 
+    const { userName, newPassword } = req;
+
+    if (!userName) {
+        return ({ message: "Nome de usuário é obrigatório" });
+    }
+
     try {
-        const { userName, newPassword } = req;
+        const result = await conn.execute(
+            `SELECT CD_USUARIO
+                FROM DBAHUMS.USERS
+                WHERE CD_USUARIO = :userName`,
+            { userName }
+        );
+
+        if (result.rows.length === 0) {
+            return ({ message: "Usuário não encontrado" });
+        }
+
+    } catch (err) {
+        return err;
+    }
+
+    if (!newPassword && !req.password) {
+        return ({ message: "Nova senha é obrigatória" });
+    }
+
+
+    try {
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         await conn.execute(
             `UPDATE DBAHUMS.USERS
-             SET 
+                SET 
                 PASSWORD = :hashedPassword,
                 UPDATED_AT = SYSDATE
-             WHERE CD_USUARIO = :userName`,
+                WHERE CD_USUARIO = :userName`,
             { hashedPassword, userName }
         );
 
@@ -84,6 +110,35 @@ export async function getAllUsers() {
 
 export async function patchInativarUsuario(userName) {
     const conn = await getConnection();
+
+    try {
+        const result = await conn.execute(
+            `SELECT CD_USUARIO
+                FROM DBAHUMS.USERS
+                WHERE CD_USUARIO = :userName`,
+            { userName }
+        );
+        if (result.rows.length === 0) {
+            return ({ message: "Usuário não encontrado" });
+        }
+    } catch (err) {
+        return err;
+    }
+
+    try {
+        const resultAtivo = await conn.execute(
+            `SELECT CD_USUARIO
+                FROM DBAHUMS.USERS
+                WHERE CD_USUARIO = :userName
+                AND INATIVATED_AT IS NOT NULL`,
+            { userName }
+        );
+        if (resultAtivo.rows.length > 0) {
+            return ({ message: "Usuário já está inativado" });
+        }
+    } catch (err) {
+        return err;
+    }
 
     try {
         await conn.execute(

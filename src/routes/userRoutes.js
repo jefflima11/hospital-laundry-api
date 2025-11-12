@@ -8,7 +8,7 @@ router.get("/users", getAllUsers);
 
 router.post("/new-user", createUser);
 
-router.patch("/change-password", patchAlterarSenha);
+router.patch("/alter-password", patchAlterarSenha);
 
 router.patch("/inactivate/:userName", patchInativarUsuario);
 

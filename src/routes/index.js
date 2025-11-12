@@ -8,11 +8,8 @@ import userRoutes from "./userRoutes.js";
 const router = Router();
 
 router.use("/login", login)
-
 router.use("/users",authMiddleware, userRoutes);
-
 router.use("/hospital-beds",authMiddleware, hospitalBedsRoutes);
-
 router.use("/infos", authMiddleware, infoRoutes);
 
 export default router; 

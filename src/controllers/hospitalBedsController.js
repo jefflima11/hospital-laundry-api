@@ -5,7 +5,7 @@ export async function getHospitalBeds(req, res, next) {
         const beds = await getHospitalBedsModel();
         res.json(beds);
     } catch (err) {
-        next(err);
+        res.status(500).json({ error: err.message });
     };
 };
 
@@ -16,7 +16,7 @@ export async function getHospitalBedsId (req, res, next) {
         const beds = await getHospitalBedsIdModel(id);
         res.json(beds);
     } catch (err) {
-        next(err);
+        res.status(500).json({ error: err.message });
     };
 };
 
@@ -25,7 +25,7 @@ export async function getHospitalBedsStatus (req, res, next)  {
         const status = await getHospitalBedsStatusModel();
         res.json(status);
     } catch (err) {
-        next(err);
+        res.status(500).json({ error: err.message });
     };
 };
 
@@ -36,7 +36,7 @@ export async function getCleaningHospitalBeds (req, res, next) {
         const beds = await getCleaningHospitalBedsModel(post);
         res.json(beds);
     } catch (err) {
-        next(err);
+        res.status(500).json({ error: err.message });
     };
 };
 
@@ -56,7 +56,7 @@ export async function getCleaningRequest(req, res, next) {
         const cleaningRequests = await getCleaningRequestModel();
         res.json(cleaningRequests)
     } catch (err) {
-        next(err);
+        res.status(500).json({ error: err.message });
     }
 };
 
@@ -71,7 +71,7 @@ export async function confirmCleaningRequest(req, res, next) {
         res.json(confirmRequests);
 
     } catch(err) {
-        next(err)
+        res.status(500).json({ error: err.message });
     };
 };
 
@@ -82,7 +82,7 @@ export async function refuseCleaningRequest(req, res, next) {
         const refuseCleaning = await refuseCleaningRequestModel(request);
         res.json(refuseCleaning);
     } catch (err) {
-        next(err);
+        res.status(500).json({ error: err.message });
     };
 };
 
@@ -91,6 +91,6 @@ export async function getRequestWaitingConfirmation(req, res, next) {
         const result = await getRequestWaitingConfirmationModel();
         res.json(result);
     } catch(err)  {
-        next(err);
+        res.status(500).json({ error: err.message });
     };
 };

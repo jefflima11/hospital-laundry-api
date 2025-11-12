@@ -8,7 +8,7 @@ export async function getInfos(req, res, next) {
             userLogged: req.user.user
         });
     } catch (err) {
-        next(err);
+        res.status(500).json({ error: "Erro ao obter as informações." });
     }
 }
 

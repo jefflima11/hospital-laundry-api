@@ -373,9 +373,9 @@ export async function getRequestWaitingConfirmation() {
                         ds_leito
                     End ds_leito,
                     cd_solic_limpeza,                
-                    dt_solic_limpeza,
                     p.nm_paciente,
-                    decode(sl.tp_solicitacao, 'C', 'Concorrente', 'A', 'Terminal', sl.tp_solicitacao) as tp_solicitacao
+                    decode(sl.tp_solicitacao, 'C', 'Concorrente', 'A', 'Terminal', sl.tp_solicitacao) as tp_solicitacao,
+                    dt_solic_limpeza
                     
                 From
                     dbamv.solic_limpeza sl
